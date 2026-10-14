@@ -1,0 +1,48 @@
+#pragma once
+
+#include <chrono>
+#include <cstddef>
+#include <memory>
+
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
+#include "../../Entities/EWormMovementState.hpp"
+#include "../../Entities/GardenEntityData.hpp"
+#include "../../Exportables/Exportable.hxx"
+#include "../Environment/GardenScript.hpp"
+#include "EntityScript.hpp"
+
+namespace OGP::Scripting::Entities {
+	class WormEntityScript : public EntityScript {
+	public:
+
+		OGP_API WormEntityScript(Klein::SceneManagement::Node* node);
+
+		OGP_API Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
+		OGP_API bool IsDeadly() const noexcept override;
+		OGP_API void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+
+	protected:
+
+		OGP_API void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
+
+	private:
+
+		OGP::Entities::EWormMovementState wormMovementState;
+		std::chrono::high_resolution_clock::duration elapsedTime;
+		bool hasStartedToMove;
+		bool isFinishingToMove;
+
+		bool IsLeftMovable(OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsRightMovable(OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtLeftBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtLeftBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetXPosition) const noexcept;
+		bool IsAtRightBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtRightBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetXPosition) const noexcept;
+		bool IsMovingLeftReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsMovingRightReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		float GetAnimatedMovementProgress() const noexcept;
+	};
+}
